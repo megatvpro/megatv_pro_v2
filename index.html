@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mega TV</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background-image: url('https://raw.githubusercontent.com/megatvpro/megatvpro/main/fondo2.webp'); /* Enlace a la imagen de fondo */
+            background-size: cover; /* Asegura que la imagen cubra toda la pantalla */
+            background-position: center; /* Centra la imagen */
+            color: white; /* Cambia el color del texto si es necesario */
+        }
+        button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        iframe {
+            width: 100%;
+            height: 500px;
+            border: none;
+            margin-top: 20px;
+        }
+        #fullscreenButton {
+            margin-top: 20px;
+        }
+        #loginForm {
+            display: none;
+            margin-bottom: 20px;
+            background-color: rgba(0, 0, 0, 0.7); /* Fondo semi-transparente para el formulario */
+            padding: 20px;
+            border-radius: 10px; /* Bordes redondeados */
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Mega TV</h1>
+
+    <div id="loginForm">
+        <h2>Iniciar Sesión</h2>
+        <input type="text" id="almendra" placeholder="Usuario" required>
+        <input type="password" id="barco" placeholder="Contraseña" required>
+        <button onclick="iniciarSesion()">Iniciar Sesión</button>
+    </div>
+
+    <div id="contenido" style="display: none;">
+        <h2>Selecciona una Transmisión</h2>
+        <button onclick="cargarEnlace('https://senalplus.xyz/CCNPL01/embed.html')">Win Premium</button>
+        <button onclick="cargarEnlace('https://senalplus.xyz/CCWSD01/embed.html')">Win Baja Resolución</button>
+        <button onclick="cargarEnlace('https://senalplus.xyz/premium/embed.html')">Win SD</button>
+        <button onclick="cargarEnlace('https://senalplus.xyz/CCRN01/embed.html')">RCN</button>
+        <button onclick="cargarEnlace('https://senalplus.xyz/CEDL01/embed.html')">Danz La Liga</button>
+        <button onclick="cargarEnlace('https://senalplus.xyz/CDN01/embed.html')">Danz 01</button>
+        <button onclick="cargarEnlace('https://senalplus.xyz/CEDF01/embed.html')">Danz F1</button>
+        <button onclick="cargarEnlace('https://senalplus.xyz/CED08/embed.html')">DSports+</button>
+        <button onclick="cargarEnlace('https://senalplus.xyz/CED01/embed.html')">DSports 1</button>
+        <button onclick="cargarEnlace('https://senalplus.xyz/CED02/embed.html')">DSports 2</button>
+        <button onclick="cargarEnlace('https://senalplus.xyz/CATC01/embed.html')">Tyc Sport</button>
+        <button onclick="cargarEnlace('https://senalplus.xyz/CEEP01/embed.html')">Espn (Ar)</button>
+        <button onclick="cargarEnlace('https://senalplus.xyz/CCC01/embed.html')">Caracol</button>
+        <button onclick="cargarEnlace('https://senalplus.xyz/CCC01HD2/embed.html')">Caracol HD2</button>
+        <button onclick="cargarEnlace('https://senalplus.xyz/CCC01AHORA/embed.html')">Caracol AHORA</button>
+        <button onclick="cargarEnlace('https://senalplus.xyz/ESPN/embed.html')">Espn Co</button>
+        <button onclick="cargarEnlace('https://senalplus.xyz/LIGAHYP/embed.html')">La Liga Hypermotion</button>
+        <button onclick="cargarEnlace('https://senalplus.xyz/NBA/embed.html')">NBA</button>
+        <button onclick="cargarEnlace('https://senalplus.xyz/MLB/embed.html')">MLB</button>
+        <button onclick="cargarEnlace('https://senalplus.xyz/ESPN3AR/embed.html')">Espn 3 AR</button>
+        <button onclick="cargarEnlace('https://senalplus.xyz/TELEFIVE/embed.html')">Telecinco</button>
+        <button onclick="cargarEnlace('https://senalplus.xyz/SCOL/embed.html')">Señal Colombia</button>
+        <button onclick="cargarEnlace('https://senalplus.xyz/TVfe/embed.html')">Telefe</button>
+        <button onclick="cargarEnlace('https://senalplus.xyz/Zapp/embed.html')">Zapping</button>
+        <button onclick="cargarEnlace('https://senalplus.xyz/ECDF/embed.html')">ECDF</button>
+        <button onclick="cargarEnlace('https://senalplus.xyz/ESPN2MX/embed.html')">ESPN 2 MX</button>
+
+        <iframe id="videoFrame" src="" frameborder="0"></iframe>
+        <button id="fullscreenButton" onclick="activarPantallaCompleta()">Pantalla Completa</button>
+    </div>
+
+    <script>
+        let violin = '';
+        let nombre = '';
+
+        // Cargar la palabra semilla desde GitHub
+        fetch('https://raw.githubusercontent.com/megatvpro/megatv_pro_v2/refs/heads/main/nombre.txt')
+            .then(response => response.text())
+            .then(data => {
+                nombre = data.trim(); 
+                document.getElementById('loginForm').style.display = 'block'; // Muestra el formulario de login
+            })
+            .catch(error => {
+                console.error('Error al cargar el nombre:', error);
+            });
+
+        function iniciarSesion() {
+            const almendraUsuario = document.getElementById('almendra').value;
+            const barcoClave = document.getElementById('barco').value;
+
+            // Enviar solicitud de inicio de sesión al servidor
+            fetch('http://<tu-ip-publica>:3000/login', { // Cambia <tu-ip-publica> por la IP de tu servidor
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username: almendraUsuario, password: barcoClave })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    violin = almendraUsuario;
+                    document.getElementById('loginForm').style.display = 'none';
+                    document.getElementById('contenido').style.display = 'block';
+                    alert(`Bienvenido, ${violin}!`);
+                } else {
+                    alert(data.message); // Mostrar el mensaje de error del servidor
+                }
+            })
+            .catch(error => {
+                console.error('Error al iniciar sesión:', error);
+            });
+        }
+
+        function cargarEnlace(link) {
+            document.getElementById('videoFrame').src = link;
+        }
+
+        function activarPantallaCompleta() {
+            const videoFrame = document.getElementById('videoFrame');
+            if (videoFrame.requestFullscreen) {
+                videoFrame.requestFullscreen();
+            } else if (videoFrame.mozRequestFullScreen) { // Firefox
+                videoFrame.mozRequestFullScreen();
+            } else if (videoFrame.webkitRequestFullscreen) { // Chrome, Safari and Opera
+                videoFrame.webkitRequestFullscreen();
+            } else if (videoFrame.msRequestFullscreen) { // IE/Edge
+                videoFrame.msRequestFullscreen();
+            }
+        }
+    </script>
+
+</body>
+</html>
